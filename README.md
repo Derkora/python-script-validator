@@ -17,6 +17,6 @@ Replace `<imagename>` with a name of your choice for the image.
 ## 3. Start the Container
 To start the Docker container, use the following command:
 ```.sh
-`sudo docker-compose up -d`
+sudo docker-compose up -d
 ```
 This will launch the container in detached mode.
