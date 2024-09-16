@@ -1,0 +1,8 @@
+version: '3'
+services:
+  soal:
+    image: <imagename>:latest
+    ports:
+      - <PORT>:<PORT>
+      # add more here
+    container_name: <yourcontainer>
