@@ -9,7 +9,7 @@ import os
 # Function to generate a unique flag
 def genFlag():
     # Change this to generate a flag of your own
-    #flag = "Flag{ChangeM3" + ''.join(random.choices(string.ascii_uppercase + string.digits, k=50)) + "}"
+    # Format flag = "Flag{ChangeM3" + ''.join(random.choices(string.ascii_lowercase + string.ascii_uppercase + string.digits, k=25)) + "}" for 25 random characters (Uppercase, Lowercase, and Numbers)
     flag = "<FLAG>"
     return flag
 
