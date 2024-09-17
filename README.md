@@ -20,3 +20,10 @@ To start the Docker container, use the following command:
 sudo docker-compose up -d
 ```
 This will launch the container in detached mode.
+
+## 4. Export
+To export the `.csv` file, use the following command:
+```.sh
+sudo bash export.sh
+```
+this will save the `.csv` file in db folder.
