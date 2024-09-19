@@ -1,0 +1,10 @@
+services:
+  soal:
+    build: .
+    ports:
+      - "10000:10000"
+      # add more here
+    volumes:
+      - ./src:/app/src 
+      - ./db:/app/db  
+    container_name: soal-container
