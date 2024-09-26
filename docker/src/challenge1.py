@@ -4,42 +4,45 @@ import random
 import socket
 from datetime import datetime
 import threading
+import os  
 
 def get_db_connection():
     try:
         connection = mysql.connector.connect(
-            # change based on your database
-            host="db",  
-            user="root",
-            password="penword",
-            database="challenge_db"
+            host=os.getenv('MYSQL_HOST'), 
+            user=os.getenv('MYSQL_USER'), 
+            password=os.getenv('MYSQL_PASSWORD'), 
+            database=os.getenv('MYSQL_DB') 
         )
-        print("Database connection successful")  
+        print("Database connection successful")
         return connection
     except mysql.connector.Error as err:
         print(f"Error connecting to MySQL: {err}")
         return None
-
 
 def setup_challenge_table(challenge_id):
     table_name = f'challenge_{challenge_id}'
     connection = get_db_connection()
     
     if connection:
-        cursor = connection.cursor()
-        create_table_query = f"""
-        CREATE TABLE IF NOT EXISTS {table_name} (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            ip VARCHAR(255) NOT NULL,
-            flag VARCHAR(255) NOT NULL,
-            timestamp DATETIME NOT NULL
-        );
-        """
-        cursor.execute(create_table_query)
-        connection.commit()
-        print(f"Table {table_name} created or already exists.")  
-        cursor.close()
-        connection.close()
+        try:
+            cursor = connection.cursor()
+            create_table_query = f"""
+            CREATE TABLE IF NOT EXISTS {table_name} (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                ip VARCHAR(255) NOT NULL,
+                flag VARCHAR(255) NOT NULL,
+                timestamp DATETIME NOT NULL
+            );
+            """
+            cursor.execute(create_table_query)
+            connection.commit()
+            print(f"Table {table_name} created or already exists.")  
+        except mysql.connector.Error as err:
+            print(f"Error creating table {table_name}: {err}")
+        finally:
+            cursor.close()
+            connection.close()
     else:
         print(f"Error: No database connection for challenge_id {challenge_id}")
     
@@ -81,23 +84,23 @@ def getQuestions():
     # Change this questions
     questions = [
         {
-            "question": "question_1?\nFormat: string_1\n> ",
-            "correct_answer": "answer_1"
+            "question": "What is the capital of Indonesia?\nFormat: string\n> ",
+            "correct_answer": "Jakarta"
         },
         {
-            "question": "\nquestion_2?\nFormat: 0\n> ",
+            "question": "\n1+1=?\nFormat: number\n> ",
             "correct_answer": "2"
         },
         {
-            "question": "\nquestion_3?\nFormat: filename.extention\n> ",
-            "correct_answer": "answer_3.jpg"
+            "question": "\nWhat is the name of this image\nFormat: filename.extention\n> ",
+            "correct_answer": "main.jpg"
         }
     ]
     return questions
 
 def getTitleAndExitInfo(difficulty):
     # Change this title
-    title = "\n\033[94m===== TITLE =====\033[0m\n"
+    title = "\n\033[94m===== TITLE 1 =====\033[0m\n"
 
     if difficulty == 1:
         diff_color = "\033[92m"  
@@ -135,8 +138,8 @@ class ProcessTheClient(threading.Thread):
         
         questions = getQuestions()
 
-         # Difficulty level set by the server (e.g., 1: easy, 2: medium, 3: hard)
-        difficulty_level = 2
+        # Difficulty level set by the server (e.g., 1: easy, 2: medium, 3: hard)
+        difficulty_level = 3
 
         title, diff_info, exit_info = getTitleAndExitInfo(difficulty_level)
         self.connection.sendall((title + diff_info + exit_info + "\n").encode())
@@ -151,18 +154,18 @@ class ProcessTheClient(threading.Thread):
                     response = self.connection.recv(128).decode().strip()
 
                     if response == "exit":
-                        self.connection.sendall("\033[92mKoneksi ditutup.\033[0m\n".encode())
+                        self.connection.sendall("\033[92mConnection closed\033[0m\n".encode())
                         self.connection.close()
                         return
 
                     if response == correct_answer:
                         break 
                     else:
-                        self.connection.sendall("\033[91mJawaban salah\033[0m\n".encode())
+                        self.connection.sendall("\033[91mWrong answer. Try again.\033[0m\n".encode())
                 except OSError:
                     return 
 
-        self.connection.sendall(f"\033[92mBenar! Ini flag-mu: {flag}\033[0m\n".encode())
+        self.connection.sendall(f"\033[92mCongratulations! Here is your flag: {flag}\033[0m\n".encode())
         self.connection.close()
 
 class Server(threading.Thread):

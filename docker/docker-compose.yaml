@@ -4,11 +4,8 @@ services:
     image: mysql:8.0
     container_name: db-container
     environment:
-      # Change database MySQL
-      MYSQL_ROOT_PASSWORD: penword # <--- Change me
-      MYSQL_DATABASE: challenge_db
-    ports:
-      - "3306:3306"
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
     volumes:
       - db_data:/var/lib/mysql
     
@@ -17,15 +14,14 @@ services:
     build: .
     container_name: soal-container
     environment:
-      # Change database MySQL
-      - MYSQL_HOST=db
-      - MYSQL_USER=root
-      - MYSQL_PASSWORD=penword # <--- Change root password
-      - MYSQL_DB=challenge_db
+      - MYSQL_HOST=${MYSQL_HOST}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_DB=${MYSQL_DATABASE}
     ports:
       - "10000:10000"
       - "10500:10500"
-      # add more ports
+      # Add more ports as needed
 
     depends_on:
       - db
@@ -36,10 +32,9 @@ services:
     container_name: adminer
     restart: always
     ports:
-      - 8080:8080  # Adminer can be accessed at <IP>:8080
-    
+      - 8080:8080
     depends_on:
       - db
-  
+
 volumes:
   db_data:

@@ -8,6 +8,7 @@ This project is designed to validate Python scripts in a Dockerized environment.
 - **Database Integration**: Stores challenge data and user progress in MySQL, ensuring persistent storage.
 - **Dockerized Environment**: Each component runs in isolated containers, simplifying deployment and scaling.
 - **Customizable**: Easily add new challenges by updating the `src/` directory with new Python scripts and challenge configurations.
+- **Environment Variable Management**: Secure and flexible configuration using a `.env` file for sensitive information.
 
 ## PREVIEW CLIENT SIDE
 ![preview](img/preview.png)
@@ -28,29 +29,15 @@ To add your Python questions or scripts, simply place them in the `src/` directo
 - **challenge**: Identifier for the challenge, such as challenge number or unique ID.
 
 ## Database Configuration
-The MySQL database stores all challenge data, including flags and user progress. **Pay close attention to properly configuring MySQL credentials (host, user, password, and database name)** in both the `challenge.py `script and the `docker-compose.yaml` file to ensure the validator can connect to the database.
+The MySQL database stores all challenge data, including flags and user progress. **All sensitive information such as MySQL credentials (host, user, password, and database name) is now managed** via the `.env` file to enhance security and flexibility.
 
-Example configuration for `challenge.py`:
-```py
-MYSQL_HOST = 'db'
-MYSQL_USER = 'root'
-MYSQL_PASSWORD = 'penword'  # Ensure this matches the environment settings
-MYSQL_DB = 'challenge_db'
-```
-
-Ensure the same credentials are consistent in `docker-compose.yaml` under the soal service environment:
-```yaml
-services:
-  db:
-    environment:
-      MYSQL_ROOT_PASSWORD: penword 
-      MYSQL_DATABASE: challenge_db
-  soal:
-    environment:
-      - MYSQL_HOST=db
-      - MYSQL_USER=root
-      - MYSQL_PASSWORD=penword
-      - MYSQL_DB=challenge_db
+`.env` File Example:
+```sh
+MYSQL_ROOT_PASSWORD=<password>
+MYSQL_DATABASE=<database>
+MYSQL_USER=<username>
+MYSQL_PASSWORD=<password>
+MYSQL_HOST=<hostname>
 ```
 
 ## Docker Configuration
@@ -82,7 +69,10 @@ To add new challenges to the project, you can modify the entrypoint.sh script to
 ```sh
 python3 challenge1.py &
 python3 challenge2.py &
-# Add more challenges here
+# add more here
+
+# Unomment below if challenge table isnt created yet, then 'sudo docker-compose up -d --build'
+# python3 debugger.py & 
 
 ```
 This script runs each challenge in the background (`&`) and keeps the container running by tailing a null file. Make sure to add any new challenge scripts to this file.
