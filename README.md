@@ -1,7 +1,6 @@
 # PYTHON SCRIPT VALIDATOR
 This project is designed to validate Python scripts in a Dockerized environment. It can be used for various purposes, including:
 - **CTF (Capture The Flag) Challenges**: Automatically validate answers submitted by players for Python-based challenges.
-- **Code Review Automation**: Validate code for syntax, logic, and structure before deployment.
 - **Python Learning Platform**: Use it as a backend to check Python exercises for students.
 
 ## FEATURES
