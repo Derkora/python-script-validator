@@ -1,20 +1,5 @@
 # PYTHON SCRIPT VALIDATOR
 This project is designed to validate Python scripts in a Dockerized environment. It can be used for various purposes, including:
-- **CTF (Capture The Flag) Challenges**: Automatically validate answers submitted by players for Python-based challenges.
-- **Python Learning Platform**: Use it as a backend to check Python exercises for students.
-
-## FEATURES
-- **Database Integration**: Stores challenge data and user progress in MySQL, ensuring persistent storage.
-- **Dockerized Environment**: Each component runs in isolated containers, simplifying deployment and scaling.
-- **Customizable**: Easily add new challenges by updating the `src/` directory with new Python scripts and challenge configurations.
-- **Environment Variable Management**: Secure and flexible configuration using a `.env` file for sensitive information.
-
-## PREVIEW CLIENT SIDE
-![preview](img/preview.png)
-
-## PREVIEW DB SIDE
-![preview db 1](img/db_1.png)
-![preview db 2](img/db_2.png)
 
 ## Add Questions
 To add your Python questions or scripts, simply place them in the `src/` directory. Each challenge must include the following configurations:
@@ -30,19 +15,19 @@ To add your Python questions or scripts, simply place them in the `src/` directo
 ## Database Configuration
 The MySQL database stores all challenge data, including flags and user progress. **All sensitive information such as MySQL credentials (host, user, password, and database name) is now managed** via the `.env` file to enhance security and flexibility.
 
-`.env` File Example:
+1. Copy the `.env.example` for your local version `.env`
+2. `.env` File Example:
 ```sh
-MYSQL_ROOT_PASSWORD=<password>
-MYSQL_DATABASE=<database>
+MYSQL_HOST=<hostname>
 MYSQL_USER=<username>
 MYSQL_PASSWORD=<password>
-MYSQL_HOST=<hostname>
+MYSQL_DATABASE=<dbname>
 ```
 
 ## Docker Configuration
 Make sure the `docker-compose.yaml` file, `Dockerfile`, and `challenge.py` all have **proper port configurations** to avoid conflicts and ensure the services run on the correct ports.
 
-**Docker Compose**: In `docker-compose.yaml`, configure the ports for the soal service to match your challenges:
+1. **Docker Compose**: In `docker-compose.yaml`, configure the ports for the soal service to match your challenges:
 ```yaml
 services:
   soal:
@@ -53,7 +38,7 @@ services:
 
 ```
 
-**Dockerfile**: In the `Dockerfile`, expose the ports for your challenges:
+2. **Dockerfile**: In the `Dockerfile`, expose the ports for your challenges:
 ```yaml
 EXPOSE 10000
 EXPOSE 10500
@@ -61,7 +46,7 @@ EXPOSE 10500
 
 ```
 
-**challenge.py**: Ensure the correct ports are being used for the challenges in `challenge.py` for each service that is running
+3. **challenge.py**: Ensure the correct ports are being used for the challenges in `challenge.py` for each service that is running
 
 ## ENTRYPOINT SCRIPT (entrypoint.sh)
 To add new challenges to the project, you can modify the entrypoint.sh script to run additional Python scripts:
@@ -82,3 +67,10 @@ To start the Docker container, use the following command:
 sudo docker-compose up -d
 ```
 This command will start the container in detached mode, running the validator in the background.
+
+## PREVIEW CLIENT SIDE
+![preview](img/preview.png)
+
+## PREVIEW DB SIDE
+![preview db 1](img/db_1.png)
+![preview db 2](img/db_2.png)
