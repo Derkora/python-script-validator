@@ -55,9 +55,6 @@ python3 challenge1.py &
 python3 challenge2.py &
 # add more here
 
-# Unomment below if challenge table isnt created yet, then 'sudo docker-compose up -d --build'
-# python3 debugger.py & 
-
 ```
 This script runs each challenge in the background (`&`) and keeps the container running by tailing a null file. Make sure to add any new challenge scripts to this file.
 
@@ -68,9 +65,8 @@ sudo docker-compose up -d
 ```
 This command will start the container in detached mode, running the validator in the background.
 
-## PREVIEW CLIENT SIDE
-![preview](img/preview.png)
+### NB
+If table does not exist in the db, just wait :D
 
-## PREVIEW DB SIDE
-![preview db 1](img/db_1.png)
-![preview db 2](img/db_2.png)
+## PREVIEW 
+![preview](img/preview.png)

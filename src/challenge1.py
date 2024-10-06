@@ -6,7 +6,8 @@ from datetime import datetime
 import threading
 import os  
 
-def get_db_connection():
+# -------- ignote this section --------
+def getDBConnection():
     try:
         connection = mysql.connector.connect(
             host=os.getenv('MYSQL_HOST'), 
@@ -20,32 +21,26 @@ def get_db_connection():
         print(f"Error connecting to MySQL: {err}")
         return None
 
-def setup_challenge_table(challenge_id):
+def setupChallengeTable(challenge_id):
     table_name = f'challenge_{challenge_id}'
-    connection = get_db_connection()
-    
-    if connection:
-        try:
-            cursor = connection.cursor()
-            create_table_query = f"""
+    connection = getDBConnection()
+    if not connection:
+        print(f"Error: No database connection for challenge_id {challenge_id}")
+        return
+
+    with connection:
+        cursor = connection.cursor()
+        cursor.execute(f"""
             CREATE TABLE IF NOT EXISTS {table_name} (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 ip VARCHAR(255) NOT NULL,
                 flag VARCHAR(255) NOT NULL,
                 timestamp DATETIME NOT NULL
             );
-            """
-            cursor.execute(create_table_query)
-            connection.commit()
-            print(f"Table {table_name} created or already exists.")  
-        except mysql.connector.Error as err:
-            print(f"Error creating table {table_name}: {err}")
-        finally:
-            cursor.close()
-            connection.close()
-    else:
-        print(f"Error: No database connection for challenge_id {challenge_id}")
-    
+        """)
+        print(f"Table {table_name} created or already exists.")
+# -------------------------------------
+
 def genFlag():
     # Change this to generate a flag of your own
     # Format <FLAG> = "Flag{ChangeM3" + ''.join(random.choices(string.ascii_lowercase + string.ascii_uppercase + string.digits, k=25)) + "}" for 25 random characters (Uppercase, Lowercase, and Numbers)
@@ -54,8 +49,8 @@ def genFlag():
 
 def getFlagForIP(challenge_id, ip_address):
     table_name = f'challenge_{challenge_id}'
-    connection = get_db_connection()
-
+    connection = getDBConnection()
+    
     if connection:
         cursor = connection.cursor()
         check_ip_query = f"SELECT flag FROM {table_name} WHERE ip = %s"
@@ -68,6 +63,7 @@ def getFlagForIP(challenge_id, ip_address):
             return result[0] 
 
         flag = genFlag()
+        # Tambah 7 jam ke waktu sekarang
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         insert_flag_query = f"INSERT INTO {table_name} (ip, flag, timestamp) VALUES (%s, %s, %s)"
         cursor.execute(insert_flag_query, (ip_address, flag, timestamp))
@@ -116,7 +112,7 @@ def getTitleAndExitInfo(difficulty):
         difficulty_label = "Unknown"
     
     diff_info = f"{diff_color}Difficulty: {difficulty_label}\033[0m\n"
-    exit_info = "\033[93mNote: You can exit anytime by typing 'exit'\033[0m\n"
+    exit_info = f"\033[94mNote: You can exit anytime by typing 'exit'\033[0m\n"
     return title, diff_info, exit_info
 
 
@@ -146,7 +142,6 @@ class ProcessTheClient(threading.Thread):
 
         for question_data in questions:
             question = question_data["question"]
-            correct_answer = question_data["correct_answer"]
 
             while True:
                 try:
@@ -158,7 +153,7 @@ class ProcessTheClient(threading.Thread):
                         self.connection.close()
                         return
 
-                    if response == correct_answer:
+                    if response == question_data["correct_answer"]:
                         break 
                     else:
                         self.connection.sendall("\033[91mWrong answer. Try again.\033[0m\n".encode())
@@ -177,7 +172,7 @@ class Server(threading.Thread):
         threading.Thread.__init__(self)
 
     def run(self):
-        setup_challenge_table(self.challenge_id)
+        setupChallengeTable(self.challenge_id)
         # Change this port
         port = 10000
         self.my_socket.bind(('0.0.0.0', port))
